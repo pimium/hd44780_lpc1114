@@ -1,8 +1,8 @@
 /*
 * =====================================================================================
-*       Filename:  sda_5708.h
+*       Filename:  hd44780.h
 *
-*    Description:  Driver file for the sda 5708 device 
+*    Description:  Driver file for the HD44780 display device 
 *
 *        Version:  1.0 
 *        Created:  26 November 2016 11:32
@@ -12,19 +12,21 @@
 *
 * =====================================================================================
 */
-#ifndef SDA_5708_H
-#define SDA_5708_H
+#ifndef HD44780_H
+#define HD44780_H
 
 #include "hdr/hdr_gpio_masked_access.h"
+
+#define HD44780_GPIO	LPC_GPIO0
 
 #define DATA_7_pin 8
 #define DATA_6_pin 9
 #define DATA_5_pin 10
 #define DATA_4_pin 11
 
-#define ENABLE_pin 9
-#define R_W_pin 10
-#define RS_pin 11
+#define ENABLE_pin 3
+#define R_W_pin 2
+#define RS_pin 1
 
 #define DATA_7 (1 << DATA_7_pin)
 #define DATA_6 (1 << DATA_6_pin)
@@ -32,19 +34,17 @@
 #define DATA_4 (1 << DATA_4_pin)
 
 #define ENABLE  (1 << ENABLE_pin)
-#define R_W 	(1 << R_W_pin_)
+#define R_W 	(1 << R_W_pin)
 #define RS 		(1 << RS_pin)
 
-void init_SDA(void);
-void write_SDA_char(unsigned int position, unsigned int value);
-void write_SDA(uint8_t value);
-
-void set_SDA_clk(void);
-void clear_SDA_clk(void);
-void set_SDA_cs(void);
-void clear_SDA_cs(void);
-void set_SDA_reset(void);
-void clear_SDA_reset(void);
-void set_SDA_data(void);
-void clear_SDA_data(void);
-#endif /* SDA_5708_H */
+void init_HD44780(void);
+void write_HD44780_data(uint8_t value);
+void write_data(unsigned int value);
+void set_HD44780_RS(void);
+void clear_HD44780_RS(void);
+void set_HD44780_R_W(void);
+void clear_HD44780_R_W(void);
+void set_HD44780_ENABLE(void);
+void clear_HD44780_ENABLE(void);
+void enable(void);
+#endif /* HD44780_H */
