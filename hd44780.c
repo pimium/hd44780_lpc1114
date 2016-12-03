@@ -79,30 +79,43 @@ void init_HD44780(void) {
   enable();
 
   write_HD44780_address(0x80);
-  write_HD44780_data(0x4C);
-  write_HD44780_data(0x50);
-  write_HD44780_data(0x43);
-  write_HD44780_data(0x31);
-  write_HD44780_data(0x31);
-  write_HD44780_data(0x31);
-  write_HD44780_data(0x34);
+  write_HD44780_data('L');
+  write_HD44780_data('P');
+  write_HD44780_data('C');
+  write_HD44780_data('1');
+  write_HD44780_data('1');
+  write_HD44780_data('1');
+  write_HD44780_data('4');
   write_HD44780_address(0xC0);
-  write_HD44780_data(0x48);
-  write_HD44780_data(0x44);
-  write_HD44780_data(0x34);
-  write_HD44780_data(0x34);
-  write_HD44780_data(0x37);
-  write_HD44780_data(0x38);
-  write_HD44780_data(0x30);
+  write_HD44780_data('H');
+  write_HD44780_data('D');
+  write_HD44780_data('4');
+  write_HD44780_data('4');
+  write_HD44780_data('7');
+  write_HD44780_data('8');
+  write_HD44780_data('0');
   write_HD44780_address(0x0B);
   write_HD44780_address(0x0C);
 
+  write_HD44780_string(0, "12345678");
+
 }
 
-void write_HD44780_data(uint8_t value) {
 
-  clear_HD44780_ENABLE();
+unsigned int read_HD44780_busy_flag(void) {
+
+	unsigned int busy_flag;
   clear_HD44780_RS();
+  set_HD44780_R_W();
+  HD44780_GPIO->DIR &= ~((DATA_4 | DATA_5 | DATA_6 | DATA_7));
+  enable();
+  busy_flag = (HD44780_GPIO->DATA)&DATA_7;
+  enable();
+  return busy_flag;
+}
+
+void write_HD44780_data(unsigned int value) {
+
   clear_HD44780_R_W();
   set_HD44780_RS();
   write_data(value >> 4);
@@ -112,10 +125,8 @@ void write_HD44780_data(uint8_t value) {
   clear_HD44780_RS();
 }
 
-void write_HD44780_address(uint8_t value) {
+void write_HD44780_address(unsigned int value) {
 
-  clear_HD44780_ENABLE();
-  clear_HD44780_RS();
   clear_HD44780_R_W();
   clear_HD44780_RS();
   write_data(value >> 4);
@@ -124,6 +135,7 @@ void write_HD44780_address(uint8_t value) {
   enable();
   clear_HD44780_RS();
 }
+
 void write_data(unsigned int value) {
 
   if (value & 0x01) {
@@ -151,34 +163,26 @@ void write_data(unsigned int value) {
   value = value >> 1;
 }
 
-// void write_SDA_char(unsigned int position, unsigned int value){
-// 	unsigned int data;
-// 	unsigned int column0 = *(Font5x7 + 5*(value + 16) + 0);
-// 	unsigned int column1 = *(Font5x7 + 5*(value + 16) + 1);
-// 	unsigned int column2 = *(Font5x7 + 5*(value + 16) + 2);
-// 	unsigned int column3 = *(Font5x7 + 5*(value + 16) + 3);
-// 	unsigned int column4 = *(Font5x7 + 5*(value + 16) + 4);
+// Position
+// 0  1  2  3  4  5  6  7 First line
+// 8  9 10 11 12 13 14 15 Second Line
+void write_HD44780_string(unsigned int position, char *str){
+	unsigned int pos;
+	char *pt;
+	pt = str;
 
-// 	if (position < 8){
-// 		data = 0xA0 + position;
-// 		write_SDA(data);
-// 	} else
-// 		return;
+	if (position > 15)
+		return;
+	else if (position > 7)
+		pos = 0xC0;
+	else
+		pos = 0x80;
 
-// 	for (int i = 0; i < 7; ++i)
-// 	{
-// 		data = ((column0 & 0x1) << 4) + ((column1 & 0x1) << 3) +
-// ((column2
-// & 0x1) << 2) + ((column3 & 0x1) << 1) + ((column4 & 0x1) << 0);
-// 		write_SDA(data);
-// 		column0 = column0 >> 1;
-// 		column1 = column1 >> 1;
-// 		column2 = column2 >> 1;
-// 		column3 = column3 >> 1;
-// 		column4 = column4 >> 1;
-// 	}
-// 	return;
-// }
+	write_HD44780_address(pos | (position&0x7));
+	while(*pt != 0)
+		write_HD44780_data(*(pt++));
+	return;
+}
 
 void set_HD44780_RS(void) { HD44780_GPIO->DATA |= RS; }
 void clear_HD44780_RS(void) { HD44780_GPIO->DATA &= ~RS; }
@@ -188,22 +192,16 @@ void clear_HD44780_R_W(void) { HD44780_GPIO->DATA &= ~R_W; }
 
 void set_HD44780_ENABLE(void) {
 
-  volatile uint32_t count, count_max = 1000000;
   HD44780_GPIO->DATA |= ENABLE;
-  for (count = 0; count < count_max; count++)
-    ;
 }
 
-void clear_HD44780_ENABLE(void) {
-  volatile uint32_t count, count_max = 1000000;
+void clear_HD44780_ENABLE(void) {//
   HD44780_GPIO->DATA &= ~ENABLE;
-  for (count = 0; count < count_max; count++)
-    ;
 }
 
 void enable(void){
 	
-	volatile uint32_t count, count_max = 5000;
+	volatile uint32_t count, count_max = 50;
 	HD44780_GPIO->DATA |= ENABLE;
   for (count = 0; count < count_max; count++)
     ;	

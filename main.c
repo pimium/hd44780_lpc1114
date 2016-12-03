@@ -80,21 +80,16 @@ int main(void) {
   pll_start(CRYSTAL, FREQUENCY); // start the PLL
   system_init();                 // initialize other necessary elements
 
-  // LED_GPIO->DIR |= LED;					// set the direction of the LED pin
-  // to
-  // output
   init_HD44780();
 
-  // write_SDA(0xC8);
   while (1) {
-    // write_SDA_char(0, 1);
-    // write_SDA_char(1, 2);
-    // write_SDA_char(2, 3);
-    // write_SDA_char(3, 4);
-    // write_SDA_char(4, 5);
-    // write_SDA_char(5, 6);
-    // write_SDA_char(6, 7);
-    // write_SDA_char(7, 8);
+  	write_HD44780_string(8, "ACT: 305");
+  	write_HD44780_string(0, "SET: 678");
+  	for (count = 0; count < count_max; count++)
+    ;
+  	write_HD44780_string(4, "    ");
+  	for (count = 0; count < count_max; count++)
+    ;
   }
 }
 
