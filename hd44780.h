@@ -39,6 +39,7 @@
 
 void init_HD44780(void);
 void write_HD44780_data(uint8_t value);
+void write_HD44780_address(uint8_t value);
 void write_data(unsigned int value);
 void set_HD44780_RS(void);
 void clear_HD44780_RS(void);

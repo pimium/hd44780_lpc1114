@@ -49,8 +49,8 @@ void init_HD44780(void) {
 
   write_data(0x2);
   enable();
-  for (count = 0; count < count_max; count++)
-    ;
+  // for (count = 0; count < count_max; count++)
+  //   ;
 
 	write_data(0x2);
   enable();
@@ -69,20 +69,38 @@ void init_HD44780(void) {
 
   write_data(0x0);
   enable();
-  write_data(0xD);
+  write_data(0xC);
   enable();
+///////
 
   write_data(0x8);
   enable();
   write_data(0x6);
   enable();
 
-  write_HD44780_data(0x55);
+  write_HD44780_address(0x80);
+  write_HD44780_data(0x4C);
+  write_HD44780_data(0x50);
+  write_HD44780_data(0x43);
+  write_HD44780_data(0x31);
+  write_HD44780_data(0x31);
+  write_HD44780_data(0x31);
+  write_HD44780_data(0x34);
+  write_HD44780_address(0xC0);
+  write_HD44780_data(0x48);
+  write_HD44780_data(0x44);
+  write_HD44780_data(0x34);
+  write_HD44780_data(0x34);
+  write_HD44780_data(0x37);
+  write_HD44780_data(0x38);
+  write_HD44780_data(0x30);
+  write_HD44780_address(0x0B);
+  write_HD44780_address(0x0C);
+
 }
 
 void write_HD44780_data(uint8_t value) {
 
-  // volatile uint32_t count, count_max = 1000;
   clear_HD44780_ENABLE();
   clear_HD44780_RS();
   clear_HD44780_R_W();
@@ -94,6 +112,18 @@ void write_HD44780_data(uint8_t value) {
   clear_HD44780_RS();
 }
 
+void write_HD44780_address(uint8_t value) {
+
+  clear_HD44780_ENABLE();
+  clear_HD44780_RS();
+  clear_HD44780_R_W();
+  clear_HD44780_RS();
+  write_data(value >> 4);
+  enable();
+  write_data(value);
+  enable();
+  clear_HD44780_RS();
+}
 void write_data(unsigned int value) {
 
   if (value & 0x01) {
@@ -173,7 +203,7 @@ void clear_HD44780_ENABLE(void) {
 
 void enable(void){
 	
-	volatile uint32_t count, count_max = 50000;
+	volatile uint32_t count, count_max = 5000;
 	HD44780_GPIO->DATA |= ENABLE;
   for (count = 0; count < count_max; count++)
     ;	
